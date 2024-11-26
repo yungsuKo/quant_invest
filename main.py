@@ -11,6 +11,28 @@ with open("key.txt") as f:
 with open("slack.txt") as f:
     slack_key = f.readline()
 
+def send(msg):
+    try:
+        url = slack_key
+        header = {'Content-type': 'application/json'}
+        icon_emoji = ":slack:"
+        username = "coin_bot"
+        attachments = [{
+            "text": msg
+        }]
+
+        data = {"username": username, "attachments": attachments, "icon_emoji": icon_emoji}
+        print(data)
+
+        # 메세지 전송
+        return requests.post(url, headers=header, json=data)
+        
+    except Exception as e:
+        print("Slack Message 전송에 실패했습니다.")
+        print("에러 내용 : " + e)
+
+        exit(0)
+        
 ### fetch 함수를 통해 안정적으로 호출
 def fetch_data(fetch_func, max_retries=20, delay=0.5):
     for i in range(max_retries):
@@ -80,6 +102,8 @@ def order_buy_market(ticker, buy_amount):
             print(res)
             res = 0
             return res
+        msg = "매도 성공 \n\n " + res
+        send(msg)
         print(res)
     except Exception as e:
         res = 0
@@ -98,6 +122,8 @@ def order_sell_market(ticker, volume):
             print(res)
             res = 0
             return res
+        msg = "매도 성공 \n\n " + res
+        send(msg)
         print(res)
     except Exception as e:
         print(e)
@@ -169,7 +195,6 @@ def trading(coin):
     else:
         print("Hold position.")
     return None
-
 
 def run():
     ret = trading(coin)
